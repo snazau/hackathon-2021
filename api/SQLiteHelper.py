@@ -1,7 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import sqlite3
 import datetime
+import json
+import sqlite3
 from threading import Lock
 
 __version__ = "0.1.0"
@@ -50,9 +51,10 @@ class SQLiteHelper:
             cursor.execute(list_transactions_by_id.replace("QUERY_NAME", '"' + str(hs_id) + '"'))
 
             rows = cursor.fetchall()
-            transaction_ids = list(set([row[1] for row in rows]))
+            transaction_ids = [row[1] for row in rows]
+            transactions_data = [json.loads(row[2]) for row in rows]
 
-            return transaction_ids
+            return transaction_ids, transactions_data
 
         finally:
             lock.release()
@@ -61,6 +63,7 @@ class SQLiteHelper:
 if __name__ == '__main__':
     db_helper = SQLiteHelper(db="./app.db")
     ids = db_helper.list_hs_ids()
-    transactions = db_helper.get_transactions_by_id(ids[0])
+    transaction_ids, transactions_data = db_helper.get_transactions_by_id(ids[0])
     print("ids", ids)
-    print("transactions", transactions)
+    print("transaction_ids", transaction_ids)
+    print("transactions_data", transactions_data)

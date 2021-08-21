@@ -30,10 +30,10 @@ def process_request():
 
 @app.route("/requests/<guid>", methods=['GET'])
 def get_results(guid):
-    transactions = db_helper.get_transactions_by_id(guid)
-    data = {
-        "transactions": transactions,
-    }
+    transactions_ids, transactions_data = db_helper.get_transactions_by_id(guid)
+    data = [
+        {"id": transaction_id, "data": transaction_data} for transaction_id, transaction_data in zip(transactions_ids, transactions_data)
+    ]
 
     response = make_json_response(data, http.HTTPStatus.OK)
     return response
