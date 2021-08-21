@@ -16,7 +16,6 @@ list_transactions_by_id = """
     FROM hs
     WHERE HsId = QUERY_NAME;
 """
-#
 
 lock = Lock()
 
@@ -43,12 +42,12 @@ class SQLiteHelper:
         finally:
             lock.release()
 
-    def get_transactions_by_id(self, transaction_id):
+    def get_transactions_by_id(self, hs_id):
         lock.acquire()
         try:
             conn = sqlite3.connect(self.db)
             cursor = conn.cursor()
-            cursor.execute(list_transactions_by_id.replace("QUERY_NAME", '"' + str(transaction_id) + '"'))
+            cursor.execute(list_transactions_by_id.replace("QUERY_NAME", '"' + str(hs_id) + '"'))
 
             rows = cursor.fetchall()
             transaction_ids = list(set([row[1] for row in rows]))
